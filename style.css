@@ -5,7 +5,7 @@
 
 #banner{
     /* background-color: rgb(60, 132, 199); */
-    background: url(assets/Mr.Turtle_bckg.PNG);
+    background: url(assets/background.png);
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -67,7 +67,7 @@
 }
 
 #banner1{
-    background: url(assets/Mr.Turtle_bckg.PNG);
+    background: url(assets/background.png);
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -76,10 +76,11 @@
 .text1{
     text-align: center;
     color: white;
-    /*padding-top: 150px;   - I want to see if we could make the border thing with this.*/
-    padding: 150px;
+    padding-top: 150px;
+    padding: 75px;
     background-color: #f6e4ad;
     border: 15px double #006882;
+    margin:auto;
 }
 .text1 h1{
     font-size: 70px;
