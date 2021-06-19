@@ -1,40 +1,179 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script src="js/phaser.min.js"></script> 
-    <script src="js/phaser_addon.js"></script> 
-    <script src="js/preloader.js"></script> 
-    <script src="js/menuscene.js"></script> 
-    <script src="js/collectobj.js"></script> 
-    <script src="js/gamescene.js"></script> 
-    <script src="js/tutorial.js"></script> 
+
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 10</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
 
-    <script>
+<script type="text/javascript">
 
-	var config = {
-		type: Phaser.AUTO,
-		width: 800,
-		height: 600,
-		backgroundColor: '#006060',
-		parent: 'phaser-example',
-		physics: {
-				default: 'arcade',
-				arcade: {
-					gravity: 0
-					//,debug: true
-				}
-			},
-		scale: {
-			mode: Phaser.Scale.FIT,
-			autoCenter: Phaser.Scale.CENTER_BOTH
-		},
-		scene: [ Preloader, MainMenu, TutorScene, GameScene ]
-	};
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
 
-	var game = new Phaser.Game(config);
-    </script>
+var player;
+var plasticBags;
+var seaweeds;
+var platforms;
+var cursors;
+var score = 0;
+var gameOver = false;
+var scoreText;
+
+var game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.image('background', 'assets/background.png');
+    this.load.image('rock', 'assets/platform.png');
+    this.load.image('plasticBag', 'assets/plasticbag.png');
+    this.load.image('seaweed', 'assets/seaweed.png');
+    this.load.image('turtle', 'assets/turtle.png');
+}
+
+function create ()
+{
+    //  A simple background for our game
+    this.add.image(400, 300, 'background');
+
+    //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms = this.physics.add.staticGroup();
+
+    //  Here we create the ground.
+    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    // platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+    //  Now let's create some ledges
+    platforms.create(600, 400, 'ground');
+    platforms.create(750, 220, 'ground');
+
+    // The player and its settings
+    player = this.physics.add.image(100, 450, 'turtle');
+    player.width = 100;
+    player.height = 100;
+
+    //  Player physics properties. Give the little guy a slight bounce.
+    player.setBounce(0.2);
+    player.setCollideWorldBounds(true);
+
+    //  Input Events
+    cursors = this.input.keyboard.createCursorKeys();
+
+    //  Some plasticBags to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+    plasticBags = this.physics.add.group({
+        key: 'plasticBag',
+        repeat: 11,
+        setXY: { x: 12, y: 0, stepX: 70 }
+    });
+
+    plasticBags.children.iterate(function (child) {
+        //  Give each plasticBag a slightly different bounce
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+    });
+
+    seaweeds = this.physics.add.group();
+
+    //  The score at beginning
+    scoreText = this.add.text(16, 16, '0', { fontSize: '32px', fill: '#000' });
+
+    //  Collide the player and the plasticBags with the platforms
+    this.physics.add.collider(player, platforms);
+    this.physics.add.collider(plasticBags, platforms);
+    this.physics.add.collider(seaweeds, platforms);
+
+    //  Checks to see if the player overlaps with any of the plasticBags, if he does call the collectPlasticBag function
+    this.physics.add.overlap(player, plasticBags, collectPlasticBag, null, this);
+
+    this.physics.add.collider(player, seaweeds, hitSeaweed, null, this);
+}
+
+function update ()
+{
+    if (gameOver)
+    {
+        return;
+    }
+
+    if (cursors.left.isDown)
+    {
+        player.setVelocityX(-15);
+        player.x -= 3;
+    }
+    else if (cursors.right.isDown)
+    {
+        player.setVelocityX(15);
+        player.x += 3;
+    }
+    else if (cursors.up.isDown)
+    {
+        player.setVelocityY(-15);
+        player.y -= 3;
+    }
+    else if (cursors.down.isDown)
+    {
+        player.setVelocityY(15);
+        player.y += 3;
+    }
+}
+
+function collectPlasticBag (player, plasticBag)
+{
+    plasticBag.disableBody(true, true);
+
+    //  Add and update the score
+    score += 10;
+    scoreText.setText(score);
+
+    if (plasticBags.countActive(true) === 0)
+    {
+        //  A new batch of plasticBags to collect
+        plasticBags.children.iterate(function (child) {
+
+            child.enableBody(true, child.x, 0, true, true);
+
+        });
+
+        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+        var seaweed = seaweeds.create(x, 16, 'seaweed');
+        seaweed.setBounce(1);
+        seaweed.setCollideWorldBounds(true);
+        seaweed.setVelocity(Phaser.Math.Between(-50, 50), 5);
+    }
+}
+
+function hitSeaweed (player, seaweed)
+{
+    this.physics.pause();
+    player.setTint(0xff0000);
+    gameOver = true;
+    console.log('game over!')
+}
+
+</script>
 
 </body>
 </html>
