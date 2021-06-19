@@ -1,0 +1,35 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#banner{
+    background-color: rgb(60, 132, 199);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}
+
+.text{
+    text-align: center;
+    color: white;
+    padding-top: 180px;
+
+}
+.text h1{
+    font-size: 130px;
+}
+
+.start{
+    margin: 70px auto 0;
+}
+
+.start a{
+    width: 150px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 10 px;
+    padding: 12px 0;
+    color: white;
+    border: .5px solid white;
+}
