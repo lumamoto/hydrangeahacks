@@ -18,7 +18,7 @@
 
 }
 .text h1{
-    font-size: 130px;
+    font-size: 150px;
 }
 
 .start{
@@ -26,7 +26,7 @@
 }
 
 .start a{
-    width: 150px;
+    width: 200px;
     text-decoration: none;
     display: inline-block;
     margin: 0 10 px;
@@ -36,6 +36,7 @@
     position: relative;
     z-index: 1;
     transition: color 0.7s;
+    font-size: 25px;
 }
 
 .start a span{
@@ -55,4 +56,26 @@
 
 .start a:hover{
     color: white;
+}
+
+#banner1{
+    background: url(assets/Mr.Turtle_bckg.PNG);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}
+
+.text1{
+    text-align: center;
+    color: white;
+    padding-top: 150px;
+
+}
+.text1 h1{
+    font-size: 70px;
+}
+
+.instruct li{
+    font-size: 30px;
+
 }
