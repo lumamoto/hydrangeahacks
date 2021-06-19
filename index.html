@@ -1,206 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Mr. Turtle</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        
+    <section id="banner">
+        <img src="assets/turtle.png" class="logo">
+        <div class="text">
+            <h1>Mr. Turtle</h1>
+            <div class="start">
+                <a href="start.html"><span></span>START GAME</a>
+                <a href="howto.html"><span></span>HOW TO PLAY</a>
+                <a href="#"><span></span>SETTINGS</a>
+            </div>
+        </div>
 
-<!doctype html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
-</head>
-<body>
-
-<script type="text/javascript">
-
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0 },
-            debug: false
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
-
-var player;
-var plasticBags;
-var seaweeds;
-var rocks;
-var bubbles;
-var sharks;
-
-var cursors;
-var score = 0;
-var gameOver = false;
-var scoreText;
-
-var game = new Phaser.Game(config);
-
-function preload ()
-{
-    this.load.image('background', 'assets/background.png');
-    this.load.image('rock', 'assets/rock.png');
-    this.load.image('plasticBag', 'assets/plasticBag.png');
-    this.load.image('bubble', 'assets/bubble.png');
-    this.load.image('seaweed', 'assets/seaweed.png');
-    this.load.image('shark', 'assets/shark.png');
-    this.load.image('turtle', 'assets/turtle.png');
-}
-
-function create ()
-{
-    //  A simple background for our game
-    this.add.image(400, 300, 'background');
-
-    //  The rocks group contains the rock and the 2 ledges we can jump on
-    rocks = this.physics.add.staticGroup();
-
-    //  Here we create the rock.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    // rocks.create(400, 568, 'rock').setScale(2).refreshBody();
-
-    //  Now let's create some rocks
-    rocks.create(50, 600, 'rock');
-    rocks.create(750, 568, 'rock');
-
-    // The player and its settings
-    player = this.physics.add.image(100, 450, 'turtle').setScale(0.5);
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-
-    //  Input Events
-    cursors = this.input.keyboard.createCursorKeys();
-
-    // add objects randomly
-    bubbles = this.physics.add.group();
-    seaweeds = this.physics.add.group();
-    sharks = this.physics.add.group();
-    plasticBags = this.physics.add.group();
-
-    const NUM_BUBBLES = 3; // 5
-    const NUM_SEAWEEDS = 5; // 15
-    const NUM_SHARKS = 2; // 5
-    const NUM_PLASTICBAGS = 10; // 25
-    const TOTAL_NUM_ITEMS = NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
-
-    for (var i = 0; i < TOTAL_NUM_ITEMS; i++) {
-        // parameters
-        var x = Phaser.Math.RND.between(0, 800);
-        var y = Phaser.Math.RND.between(0, 600);
-        var object;
-        if (i < NUM_BUBBLES) { // 5 bubbles
-            object = bubbles.create(x, y, 'bubble');
-            object.setScale(0.75);
-        } else if (i < NUM_BUBBLES + NUM_SEAWEEDS) { // 15 seaweed
-            object = seaweeds.create(x, y, 'seaweed');
-            object.setScale(0.5);
-        } else if (i < NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS) { // 5 sharks
-            object = sharks.create(x, y, 'shark');
-            object.setVelocity(Phaser.Math.Between(-150, 150), 10);
-            object.setBounce(1);
-            object.setCollideWorldBounds(true);
-            continue
-        } else { // 25 plastic bags
-            object = plasticBags.create(x, y, 'plasticBag')
-            object.setScale(0.5);
-        }
-        object.setVelocity(Phaser.Math.Between(-50, 50), 5);
-    }
-
-    //  The score at beginning
-    scoreText = this.add.text(16, 16, '0', { fontSize: '32px', fill: '#000' });
-
-    //  Collide the player and other objects with the rocks
-    this.physics.add.collider(player, rocks);
-    this.physics.add.collider(plasticBags, rocks);
-    this.physics.add.collider(seaweeds, rocks);
-    this.physics.add.collider(bubbles, rocks);
-    this.physics.add.collider(sharks, rocks);
-
-    //  Checks to see if the player overlaps with any of the plasticBags, if he does call the collectPlasticBag function
-    this.physics.add.overlap(player, plasticBags, collectPlasticBag, null, this);
-
-    var obstacles = [seaweeds, sharks];
-    this.physics.add.collider(player, obstacles, hitObstacle, null, this);
-}
-
-function update ()
-{
-    if (gameOver)
-    {
-        return;
-    }
-
-    if (cursors.left.isDown)
-    {
-        player.setVelocityX(-15);
-        player.x -= 3;
-    }
-    else if (cursors.right.isDown)
-    {
-        player.setVelocityX(15);
-        player.x += 3;
-    }
-    else if (cursors.up.isDown)
-    {
-        player.setVelocityY(-15);
-        player.y -= 3;
-    }
-    else if (cursors.down.isDown)
-    {
-        player.setVelocityY(15);
-        player.y += 3;
-    }
-}
-
-function collectPlasticBag (player, plasticBag)
-{
-    plasticBag.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
-    scoreText.setText(score);
-
-    // when all bags are collected...
-    if (plasticBags.countActive(true) === 0)
-    {
-        //  A new batch of plasticBags to collect
-        plasticBags.children.iterate(function (child) {
-            child.enableBody(true, child.x, 0, true, true);
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var seaweed = seaweeds.create(x, 16, 'seaweed');
-        seaweed.setBounce(1);
-        seaweed.setCollideWorldBounds(true);
-        seaweed.setVelocity(Phaser.Math.Between(-50, 50), 5);
-        seaweed.setScale(0.5);
-    }
-}
-
-function hitObstacle(player, obstacle)
-{
-    this.physics.pause();
-    player.setTint(0xff0000);
-    gameOver = true;
-    console.log('game over!')
-}
-
-</script>
-
-</body>
+    </section>
+    <iframe src="start.html" height="550" width="800">game not available</iframe>
+    </body>
 </html>
