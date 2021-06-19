@@ -90,32 +90,40 @@ function create ()
     sharks = this.physics.add.group();
     plasticBags = this.physics.add.group();
 
-    for (var i = 0; i < 50; i++) {
+    const NUM_BUBBLES = 3; // 5
+    const NUM_SEAWEEDS = 5; // 15
+    const NUM_SHARKS = 2; // 5
+    const NUM_PLASTICBAGS = 10; // 25
+    const TOTAL_NUM_ITEMS = NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
+
+    for (var i = 0; i < TOTAL_NUM_ITEMS; i++) {
         // parameters
         var x = Phaser.Math.RND.between(0, 800);
         var y = Phaser.Math.RND.between(0, 600);
         var object;
-        if (i < 5) { // 5 bubbles
+        if (i < NUM_BUBBLES) { // 5 bubbles
             object = bubbles.create(x, y, 'bubble');
             object.setScale(0.75);
-        } else if (i < 20) { // 15 seaweed
+        } else if (i < NUM_BUBBLES + NUM_SEAWEEDS) { // 15 seaweed
             object = seaweeds.create(x, y, 'seaweed');
             object.setScale(0.5);
-        } else if (i < 25) { // 5 sharks
+        } else if (i < NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS) { // 5 sharks
             object = sharks.create(x, y, 'shark');
+            object.setVelocity(Phaser.Math.Between(-150, 150), 10);
+            object.setBounce(1);
+            object.setCollideWorldBounds(true);
+            continue
         } else { // 25 plastic bags
             object = plasticBags.create(x, y, 'plasticBag')
             object.setScale(0.5);
         }
-        object.setBounce(1);
-        object.setCollideWorldBounds(true);
         object.setVelocity(Phaser.Math.Between(-50, 50), 5);
     }
 
     //  The score at beginning
     scoreText = this.add.text(16, 16, '0', { fontSize: '32px', fill: '#000' });
 
-    //  Collide the player and the plasticBags with the rocks
+    //  Collide the player and other objects with the rocks
     this.physics.add.collider(player, rocks);
     this.physics.add.collider(plasticBags, rocks);
     this.physics.add.collider(seaweeds, rocks);
