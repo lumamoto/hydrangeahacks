@@ -11,6 +11,14 @@
     height: 100vh;
 }
 
+.logo{
+    width: 140px;
+    position: absolute;
+    top: 4%;
+    left: 2%;
+}
+
+
 .text{
     text-align: center;
     color: white;
@@ -59,26 +67,30 @@
 }
 
 #banner1{
-    background: url(assets/Mr.Turtle_bckg.PNG);
+    background: url(assets/background.png);
     background-size: cover;
     background-position: center;
     height: 100vh;
 }
-
+#container1{
+  margin:auto;
+  padding:7.5%;
+}
 .text1{
     text-align: center;
     color: white;
-    padding-top: 150px;
     padding: 75px;
     background-color: #f6e4ad;
     border: 15px double #006882;
-    margin:auto;
+    margin-left:10%;
+    margin-right:10%;
 }
 .text1 h1{
     font-size: 70px;
+    color:#242424;
 }
 
 .instruct li{
     font-size: 30px;
-
+    color:#242424;
 }
