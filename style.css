@@ -119,4 +119,10 @@
 #container2{
     margin:auto;
     padding:7.5%;
-  }
+}
+
+.text2 p{
+    color: black;
+    font-size: 25px;
+}
+
