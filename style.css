@@ -72,18 +72,25 @@
     background-position: center;
     height: 100vh;
 }
-
+#container1{
+  margin:auto;
+  padding:7.5%;
+}
 .text1{
     text-align: center;
     color: white;
     padding: 75px;
     background-color: #f6e4ad;
     border: 15px double #006882;
+    margin-left:10%;
+    margin-right:10%;
 }
 .text1 h1{
     font-size: 70px;
+    color:#242424;
 }
 
 .instruct li{
     font-size: 30px;
+    color:#242424;
 }
