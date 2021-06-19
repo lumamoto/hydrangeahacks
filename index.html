@@ -32,7 +32,7 @@ var config = {
     }
 };
 
-var player;
+var turtle;
 var stars;
 var bombs;
 var platforms;
@@ -70,11 +70,11 @@ function create ()
     platforms.create(750, 220, 'ground');
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'dude');
+    turtle = this.physics.add.sprite(100, 450, 'dude');
 
     //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
+    turtle.setBounce(0.2);
+    turtle.setCollideWorldBounds(true);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -139,26 +139,26 @@ function update ()
 
     if (cursors.left.isDown)
     {
-        player.setVelocityX(-160);
+        turtle.setVelocityX(-160);
 
-        player.anims.play('left', true);
+        turtle.anims.play('left', true);
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(160);
+        turtle.setVelocityX(160);
 
-        player.anims.play('right', true);
+        turtle.anims.play('right', true);
     }
     else
     {
-        player.setVelocityX(0);
+        turtle.setVelocityX(0);
 
-        player.anims.play('turn');
+        turtle.anims.play('turn');
     }
 
     if (cursors.up.isDown && player.body.touching.down)
     {
-        player.setVelocityY(-330);
+        turtle.setVelocityY(-330);
     }
 }
 
@@ -179,7 +179,7 @@ function collectStar (player, star)
 
         });
 
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+        var x = (turtle.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
         var bomb = bombs.create(x, 16, 'bomb');
         bomb.setBounce(1);
@@ -194,9 +194,9 @@ function hitBomb (player, bomb)
 {
     this.physics.pause();
 
-    player.setTint(0xff0000);
+    turtle.setTint(0xff0000);
 
-    player.anims.play('turn');
+    turtle.anims.play('turn');
 
     gameOver = true;
 }
