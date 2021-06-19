@@ -68,10 +68,11 @@
 .text1{
     text-align: center;
     color: white;
-    /*padding-top: 150px;   - I want to see if we could make the border thing with this.*/
-    padding: 150px;
+    padding-top: 150px;
+    padding: 75px;
     background-color: #f6e4ad;
     border: 15px double #006882;
+    margin:auto;
 }
 .text1 h1{
     font-size: 70px;
