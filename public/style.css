@@ -94,3 +94,29 @@
     font-size: 30px;
     color:#242424;
 }
+
+#banner2{
+    background: url(assets/background.PNG);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}
+
+.text2{
+    text-align: center;
+    color: white;
+    padding: 75px;
+    background-color: #f6e4ad;
+    border: 15px double #006882;
+    margin-left:10%;
+    margin-right:10%;
+}
+.text2 h1{
+    font-size: 70px;
+    color:#242424;
+}
+
+#container2{
+    margin:auto;
+    padding:7.5%;
+}
