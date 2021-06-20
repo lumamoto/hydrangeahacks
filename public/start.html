@@ -2,8 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Mr. Turtle Game</title>
-    <title>Mr. Turtle</title>
+    <title>Mr. Turtle - Game</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -18,7 +17,7 @@
 var config = {
     type: Phaser.AUTO,
     width: 800,
-    height: 600,
+    height: 800,
     physics: {
         default: 'arcade',
         arcade: {
@@ -61,21 +60,30 @@ function preload ()
 function create ()
 {
     //  A simple background for our game
-    this.add.image(400, 300, 'background');
+    // this.add.image(400, 300, 'background');
+    this.add.image(0, 0, 'background').setOrigin(0,0);
 
-    //  The rocks group contains the rock and the 2 ledges we can jump on
+    //  Set the camera bounds to be the size of the image
+    this.cameras.main.setBounds(0, 0, 2500, 800);
+
+    // Set world bounds
+    this.physics.world.setBounds(0, 0, 2500, 800)
+
+    // Make rocks
+    const NUM_ROCKS = 5;
     rocks = this.physics.add.staticGroup();
-
-    //  Here we create the rock.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    // rocks.create(400, 568, 'rock').setScale(2).refreshBody();
-
-    //  Now let's create some rocks
-    rocks.create(50, 600, 'rock');
-    rocks.create(750, 568, 'rock');
+    for (var i = 0; i < NUM_ROCKS; i++) {
+        // parameters
+        var x = Phaser.Math.RND.between(0, 2500);
+        var y = Phaser.Math.RND.between(720, 800);
+        rocks.create(x, y, 'rock')
+    }
 
     // The player and its settings
     player = this.physics.add.image(100, 450, 'turtle').setScale(0.5);
+
+    // Camera follows player
+    this.cameras.main.startFollow(player);
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
@@ -85,21 +93,21 @@ function create ()
     cursors = this.input.keyboard.createCursorKeys();
 
     // add objects randomly
-    bubbles = this.physics.add.group();
+    bubbles = this.physics.add.group(name='bubbles');
     seaweeds = this.physics.add.group();
     sharks = this.physics.add.group();
     plasticBags = this.physics.add.group();
 
-    const NUM_BUBBLES = 3; // 5
-    const NUM_SEAWEEDS = 5; // 15
-    const NUM_SHARKS = 2; // 5
-    const NUM_PLASTICBAGS = 10; // 25
+    const NUM_BUBBLES = 5; // 5
+    const NUM_SEAWEEDS = 15; // 15
+    const NUM_SHARKS = 5; // 5
+    const NUM_PLASTICBAGS = 25; // 25
     const TOTAL_NUM_ITEMS = NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
 
     for (var i = 0; i < TOTAL_NUM_ITEMS; i++) {
         // parameters
-        var x = Phaser.Math.RND.between(0, 800);
-        var y = Phaser.Math.RND.between(0, 600);
+        var x = Phaser.Math.RND.between(0, 2500);
+        var y = Phaser.Math.RND.between(0, 800);
         var object;
         if (i < NUM_BUBBLES) { // 5 bubbles
             object = bubbles.create(x, y, 'bubble');
@@ -118,6 +126,8 @@ function create ()
             object.setScale(0.5);
         }
         object.setVelocity(Phaser.Math.Between(-50, 50), 5);
+        object.setBounce(1);
+        object.setCollideWorldBounds(true);
     }
 
     //  The score at beginning
@@ -130,8 +140,10 @@ function create ()
     this.physics.add.collider(bubbles, rocks);
     this.physics.add.collider(sharks, rocks);
 
-    //  Checks to see if the player overlaps with any of the plasticBags, if he does call the collectPlasticBag function
-    this.physics.add.overlap(player, plasticBags, collectPlasticBag, null, this);
+
+    //  Checks to see if the player overlaps with any of the plasticBags, if he does call the collect function
+    var collectibles = [bubbles, plasticBags]
+    this.physics.add.overlap(player, collectibles, collectItem, null, this);
 
     var obstacles = [seaweeds, sharks];
     this.physics.add.collider(player, obstacles, hitObstacle, null, this);
@@ -147,11 +159,13 @@ function update ()
     {
         player.setVelocityX(-15);
         player.x -= 3;
+        player.setScale(-0.5, 0.5); // flip image
     }
     else if (cursors.right.isDown)
     {
         player.setVelocityX(15);
         player.x += 3;
+        player.setScale(0.5, 0.5); // flip image
     }
     else if (cursors.up.isDown)
     {
@@ -163,32 +177,19 @@ function update ()
         player.setVelocityY(15);
         player.y += 3;
     }
+
 }
 
-function collectPlasticBag (player, plasticBag)
+
+
+function collectItem (player, item)
 {
-    plasticBag.disableBody(true, true);
+    item.disableBody(true, true);
 
     //  Add and update the score
     score += 10;
     scoreText.setText(score);
 
-    // when all bags are collected...
-    if (plasticBags.countActive(true) === 0)
-    {
-        //  A new batch of plasticBags to collect
-        plasticBags.children.iterate(function (child) {
-            child.enableBody(true, child.x, 0, true, true);
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var seaweed = seaweeds.create(x, 16, 'seaweed');
-        seaweed.setBounce(1);
-        seaweed.setCollideWorldBounds(true);
-        seaweed.setVelocity(Phaser.Math.Between(-50, 50), 5);
-        seaweed.setScale(0.5);
-    }
 }
 
 function hitObstacle(player, obstacle)
