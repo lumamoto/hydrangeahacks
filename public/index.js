@@ -1,2 +1,284 @@
-import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-console.log('hi from index!')
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 800;
+const BG_WIDTH = 2500;
+const BG_HEIGHT = 800;
+const NUM_ROCKS = 5;
+const NUM_BUBBLES = 5; // 5
+const NUM_SEAWEEDS = 0; // 15
+const NUM_SHARKS = 0; // 5
+const NUM_PLASTICBAGS = 25; // 25
+const TOTAL_NUM_ITEMS =
+  NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
+
+var GameScene = new Phaser.Class({
+  Extends: Phaser.Scene,
+
+  initialize: function GameScene() {
+    Phaser.Scene.call(this, { key: "gameScene" });
+  },
+
+  preload: function () {
+    score = 0;
+    numBagsCollected = 0;
+    numBubblesCollected = 0;
+    gameOver = false;
+    inDialogue = false;
+
+    this.load.image("background", "assets/background.png");
+    this.load.image("rock", "assets/rock.png");
+    this.load.image("plasticBag", "assets/plasticbag.png");
+    this.load.image("bubble", "assets/bubble.png");
+    this.load.image("seaweed", "assets/seaweed.png");
+    this.load.image("shark", "assets/shark.png");
+    this.load.image("turtle", "assets/turtle.png");
+    this.load.image("diver", "assets/diver.png");
+  },
+
+  create: function () {
+    //  A simple background for our game
+    this.add.image(0, 0, "background").setOrigin(0, 0);
+
+    //  Set the camera bounds to be the size of the image
+    this.cameras.main.setBounds(0, 0, BG_WIDTH, BG_HEIGHT);
+
+    // Set world bounds
+    this.physics.world.setBounds(0, 0, BG_WIDTH, BG_HEIGHT);
+
+    // Make rocks
+    rocks = this.physics.add.staticGroup();
+    for (var i = 0; i < NUM_ROCKS; i++) {
+      // parameters
+      var x = Phaser.Math.RND.between(0, BG_WIDTH);
+      var y = Phaser.Math.RND.between(720, BG_HEIGHT);
+      rocks.create(x, y, "rock");
+    }
+
+    // The player and its settings
+    player = this.physics.add.image(100, 450, "turtle").setScale(0.5);
+
+    // Camera follows player
+    this.cameras.main.startFollow(player);
+
+    //  Player physics properties. Give the little guy a slight bounce.
+    player.setBounce(0.2);
+    player.setCollideWorldBounds(true);
+
+    // Add diver at end of map at 2200, 200
+    diver = this.physics.add.image(200, 200, "diver");
+
+    //  Input Events
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // add objects randomly
+    bubbles = this.physics.add.group();
+    seaweeds = this.physics.add.group();
+    sharks = this.physics.add.group();
+    plasticBags = this.physics.add.group();
+
+    for (var i = 0; i < TOTAL_NUM_ITEMS; i++) {
+      // parameters
+      var x = Phaser.Math.RND.between(0, BG_WIDTH);
+      var y = Phaser.Math.RND.between(0, BG_HEIGHT);
+      var object;
+      if (i < NUM_BUBBLES) {
+        // 5 bubbles
+        object = bubbles.create(x, y, "bubble");
+        object.setScale(0.75);
+      } else if (i < NUM_BUBBLES + NUM_SEAWEEDS) {
+        // 15 seaweed
+        object = seaweeds.create(x, y, "seaweed");
+        object.setScale(0.5);
+      } else if (i < NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS) {
+        // 5 sharks
+        object = sharks.create(x, y, "shark");
+        object.setVelocity(Phaser.Math.Between(-150, 150), 10);
+        object.setBounce(1);
+        object.setCollideWorldBounds(true);
+        continue;
+      } else {
+        // 25 plastic bags
+        object = plasticBags.create(x, y, "plasticBag");
+        object.setScale(0.5);
+      }
+      object.setVelocity(Phaser.Math.Between(-50, 50), 5);
+      object.setBounce(1);
+      object.setCollideWorldBounds(true);
+    }
+
+    //  The score at beginning
+    scoreText = this.add.text(16, 16, "0", {
+      fontFamily: "Arial",
+      fontSize: "32px",
+      fill: "#000",
+    });
+    // scoreText.anchor.setTo(0,0);
+
+    //  Collide the player and other objects with the rocks
+    this.physics.add.collider(player, rocks);
+    this.physics.add.collider(plasticBags, rocks);
+    this.physics.add.collider(seaweeds, rocks);
+    this.physics.add.collider(bubbles, rocks);
+    this.physics.add.collider(sharks, rocks);
+
+    //  Checks to see if the player overlaps with any of the collectibles
+    var collectibles = [bubbles, plasticBags];
+    this.physics.add.overlap(player, collectibles, collectItem, null, this);
+
+    // Check for collisions with obstacles
+    var obstacles = [seaweeds, sharks];
+    this.physics.add.collider(player, obstacles, hitObstacle, null, this);
+
+    // Check if collided with diver
+    this.physics.add.collider(player, diver, talkToDiver, null, this);
+  },
+  update: function () {
+    if (gameOver) {
+      return;
+    }
+
+    if (inDialogue) {
+      if (cursors.space.isDown) {
+        this.scene.restart();
+      } else {
+        return;
+      }
+    }
+
+    if (cursors.left.isDown) {
+      player.setVelocityX(-15);
+      player.x -= 3;
+      player.setScale(-0.5, 0.5); // flip image
+    } else if (cursors.right.isDown) {
+      player.setVelocityX(15);
+      player.x += 3;
+      player.setScale(0.5, 0.5); // flip image
+    } else if (cursors.up.isDown) {
+      player.setVelocityY(-15);
+      player.y -= 3;
+    } else if (cursors.down.isDown) {
+      player.setVelocityY(15);
+      player.y += 3;
+    }
+  },
+});
+
+var config = {
+  type: Phaser.AUTO,
+  width: CANVAS_WIDTH,
+  height: CANVAS_HEIGHT,
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: false,
+    },
+  },
+  scene: [GameScene],
+};
+
+var player;
+var plasticBags;
+var bubbles;
+var seaweeds;
+var sharks;
+var rocks;
+var diver;
+
+var cursors;
+var graphics;
+var scoreText;
+var score;
+var numBagsCollected;
+var numBubblesCollected;
+var gameOver;
+var inDialogue;
+
+var game = new Phaser.Game(config);
+
+function collectItem(player, item) {
+  item.disableBody(true, true);
+  if (item.texture.key === "bubble") {
+    score += 100;
+    numBubblesCollected += 1;
+    inDialogue = true;
+  } else {
+    score += 10;
+    numBagsCollected += 1;
+  }
+  scoreText.setText(score);
+}
+
+function hitObstacle(player, obstacle) {
+  this.physics.pause();
+  player.setTint(0xff0000);
+  gameOver = true;
+  console.log("game over!");
+}
+
+function makeTextBox(content) {
+  graphics = this.add.graphics({ fillStyle: { color: 0xf6e5ac, alpha: 0.7 } });
+  graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
+  var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
+  var text = this.add
+    .text(CANVAS_WIDTH / 8 + 20, CANVAS_HEIGHT / 4 + 20, content, {
+      fontSize: 22,
+      fontFamily: "Arial",
+      color: "#005C7A",
+      wordWrap: { width: 600 - 40 },
+    })
+    .setOrigin(0);
+  text.setMask(mask);
+}
+
+function talkToDiver(player, diver) {
+  console.log("talking to diver!");
+  this.physics.pause(); // pause game
+  inDialogue = true;
+
+  // Cover singular or plural bags/bubbles
+  var BAGS = "plastic bags";
+  var BUBBLES = "bubbles";
+  if (numBagsCollected == 1) {
+    BAGS = "plastic bag";
+  }
+  if (numBubblesCollected == 1) {
+    BUBBLES = "bubble";
+  }
+
+  // Set up text box content
+  var content = [
+    "Thank you for your help, Mr. Turtle! I couldn't have done it without you.",
+    "\n",
+    "You collected " +
+      numBagsCollected +
+      " " +
+      BAGS +
+      " and popped " +
+      numBubblesCollected +
+      " " +
+      BUBBLES +
+      ".",
+    "Your final score is " + score + "!",
+    "\n",
+    "Press SPACE to play again.",
+  ];
+
+  // Make text box
+  graphics = this.add.graphics({
+    fillStyle: {
+      color: 0xf6e5ac,
+      alpha: 0.75,
+    },
+  });
+  graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
+  var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
+  var text = this.add
+    .text(CANVAS_WIDTH / 8 + 20, CANVAS_HEIGHT / 4 + 20, content, {
+      fontSize: 22,
+      fontFamily: "Arial",
+      color: "#005C7A",
+      wordWrap: { width: 600 - 40 },
+    })
+    .setOrigin(0);
+  text.setMask(mask);
+}
