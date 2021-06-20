@@ -357,7 +357,7 @@ var LossScene = new Phaser.Class({
     // Make text box
     graphics = this.add.graphics({
       fillStyle: {
-        color: 0xB67975, // pink
+        color: 0xb67975, // pink
         alpha: 0.75,
       },
     });
