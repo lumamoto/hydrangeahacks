@@ -3,6 +3,8 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Mr. Turtle - Game</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- <canvas style="margin:auto;"></canvas> -->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -10,8 +12,7 @@
         }
     </style>
 </head>
-<body>
-
+<body style="background-image: linear-gradient(#1AADB7, #00667E);">
 <script type="text/javascript">
 
 var config = {
@@ -55,6 +56,7 @@ function preload ()
     this.load.image('seaweed', 'assets/seaweed.png');
     this.load.image('shark', 'assets/shark.png');
     this.load.image('turtle', 'assets/turtle.png');
+    this.load.image('diver', 'assets/diver.png');
 }
 
 function create ()
@@ -89,18 +91,21 @@ function create ()
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
+    // Add diver at end of map at 2200, 200
+    diver = this.physics.add.image(200, 200, 'diver')
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
     // add objects randomly
-    bubbles = this.physics.add.group(name='bubbles');
+    bubbles = this.physics.add.group();
     seaweeds = this.physics.add.group();
     sharks = this.physics.add.group();
     plasticBags = this.physics.add.group();
 
     const NUM_BUBBLES = 5; // 5
-    const NUM_SEAWEEDS = 15; // 15
-    const NUM_SHARKS = 5; // 5
+    const NUM_SEAWEEDS = 0; // 15
+    const NUM_SHARKS = 0; // 5
     const NUM_PLASTICBAGS = 25; // 25
     const TOTAL_NUM_ITEMS = NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
 
@@ -140,13 +145,16 @@ function create ()
     this.physics.add.collider(bubbles, rocks);
     this.physics.add.collider(sharks, rocks);
 
-
-    //  Checks to see if the player overlaps with any of the plasticBags, if he does call the collect function
+    //  Checks to see if the player overlaps with any of the collectibles
     var collectibles = [bubbles, plasticBags]
     this.physics.add.overlap(player, collectibles, collectItem, null, this);
 
+    // Check for collisions with obstacles
     var obstacles = [seaweeds, sharks];
     this.physics.add.collider(player, obstacles, hitObstacle, null, this);
+
+    // Check if collided with diver
+    this.physics.add.collider(player, diver, talkToDiver, null, this);
 }
 
 function update ()
@@ -186,11 +194,12 @@ function update ()
 function collectItem (player, item)
 {
     item.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
+    if (item.texture.key === 'bubble') {
+        score += 100;
+    } else {
+        score += 10;
+    }
     scoreText.setText(score);
-
 }
 
 function hitObstacle(player, obstacle)
@@ -201,6 +210,13 @@ function hitObstacle(player, obstacle)
     console.log('game over!')
 }
 
-</script>
+function talkToDiver (player, diver)
+{
+    console.log('talking to diver!')
+    this.physics.pause();
+    gameOver = true;
+}
 
+
+</script>
 </body>
