@@ -1,6 +1,8 @@
 *{
     margin: 0;
     padding: 0;
+    font-family: 'Balsamiq Sans';
+    font-family: 'Luckiest Guy';
 }
 
 #banner{
@@ -34,7 +36,7 @@
 }
 
 .start a{
-    width: 200px;
+    width: 220px;
     text-decoration: none;
     display: inline-block;
     margin: 0 10 px;
@@ -44,7 +46,8 @@
     position: relative;
     z-index: 1;
     transition: color 0.7s;
-    font-size: 25px;
+    font-size: 30px;
+    font-family: 'Balsamiq Sans';
 }
 
 .start a span{
@@ -88,11 +91,13 @@
 .text1 h1{
     font-size: 70px;
     color:#242424;
+
 }
 
 .instruct li{
     font-size: 30px;
     color:#242424;
+    font-family: 'Balsamiq Sans';
 }
 
 #banner2{
@@ -124,5 +129,6 @@
 .text2 p{
     color: black;
     font-size: 25px;
+    font-family: 'Balsamiq Sans';
 }
 
