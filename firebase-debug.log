@@ -1,0 +1,41 @@
+[debug] [2021-06-20T15:29:27.826Z] ----------------------------------------------------------------------
+[debug] [2021-06-20T15:29:27.828Z] Command:       /usr/local/bin/firebase /Users/laceyumamoto/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase emulators:start
+[debug] [2021-06-20T15:29:27.829Z] CLI Version:   8.2.0
+[debug] [2021-06-20T15:29:27.829Z] Platform:      darwin
+[debug] [2021-06-20T15:29:27.829Z] Node Version:  v12.16.1
+[debug] [2021-06-20T15:29:27.841Z] Time:          Sun Jun 20 2021 08:29:27 GMT-0700 (Pacific Daylight Time)
+[debug] [2021-06-20T15:29:27.841Z] ----------------------------------------------------------------------
+[debug] [2021-06-20T15:29:27.841Z] 
+[debug] [2021-06-20T15:29:27.851Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-06-20T15:29:27.852Z] > authorizing via signed-in user
+[info] i  emulators: Starting emulators: hosting
+[debug] [2021-06-20T15:29:27.916Z] [hub] writing locator at /var/folders/0d/8sbhrpkx33ndpf5wkc24ywm40000gn/T/hub-mr-turtle.json
+[info] ✔  hub: emulator hub started at http://localhost:4400
+[debug] [2021-06-20T15:29:27.925Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/mr-turtle/webApps/-/config  
+ 
+[debug] [2021-06-20T15:29:28.747Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 20 Jun 2021 15:29:28 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] i  hosting[mr-turtle]: Serving hosting files from: public
+[info] ✔  hosting[mr-turtle]: Local server: http://localhost:5000
+[info] ✔  hosting: hosting emulator started at http://localhost:5000
+[info] ✔  emulators: All emulators started, it is now safe to connect.
+[debug] [2021-06-20T16:03:04.242Z] ----------------------------------------------------------------------
+[debug] [2021-06-20T16:03:04.244Z] Command:       /usr/local/bin/firebase /Users/laceyumamoto/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase emulators:start
+[debug] [2021-06-20T16:03:04.244Z] CLI Version:   8.2.0
+[debug] [2021-06-20T16:03:04.244Z] Platform:      darwin
+[debug] [2021-06-20T16:03:04.244Z] Node Version:  v12.16.1
+[debug] [2021-06-20T16:03:04.254Z] Time:          Sun Jun 20 2021 09:03:04 GMT-0700 (Pacific Daylight Time)
+[debug] [2021-06-20T16:03:04.254Z] ----------------------------------------------------------------------
+[debug] [2021-06-20T16:03:04.255Z] 
+[debug] [2021-06-20T16:03:04.292Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-06-20T16:03:04.293Z] > authorizing via signed-in user
+[info] i  emulators: Starting emulators: hosting
+[warn] ⚠  emulators: It seems that you are running multiple instances of the emulator suite for project mr-turtle. This may result in unexpected behavior.
+[debug] [2021-06-20T16:03:04.416Z] [hub] writing locator at /var/folders/0d/8sbhrpkx33ndpf5wkc24ywm40000gn/T/hub-mr-turtle.json
+[info] ✔  hub: emulator hub started at http://localhost:4400
+[debug] [2021-06-20T16:03:04.427Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/mr-turtle/webApps/-/config  
+ 
+[debug] [2021-06-20T16:03:05.269Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 20 Jun 2021 16:03:05 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] i  hosting[mr-turtle]: Serving hosting files from: public
+[info] ✔  hosting[mr-turtle]: Local server: http://localhost:5000
+[info] ✔  hosting: hosting emulator started at http://localhost:5000
+[info] ✔  emulators: All emulators started, it is now safe to connect.
