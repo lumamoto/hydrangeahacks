@@ -29,6 +29,7 @@
 }
 .text h1{
     font-size: 150px;
+    font-family: 'Luckiest Guy';
 }
 
 .start{
@@ -87,8 +88,8 @@
     border: 15px double #006882;
     margin-left:10%;
     margin-right:10%;
-    font-family: Balsamiq Sans;
 }
+
 .text1 h1{
     font-size: 70px;
     color:#242424;
@@ -102,7 +103,7 @@
 }
 
 #banner2{
-    background: url(assets/background.PNG);
+    background: url(assets/background.png);
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -116,7 +117,6 @@
     border: 15px double #006882;
     margin-left:10%;
     margin-right:10%;
-    font-family: Balsamiq Sans;
 }
 
 .text2 h1{
