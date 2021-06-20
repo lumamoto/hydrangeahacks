@@ -4,17 +4,18 @@ const BG_WIDTH = 2500;
 const BG_HEIGHT = 800;
 const NUM_ROCKS = 5;
 const NUM_BUBBLES = 5; // 5
-const NUM_SEAWEEDS = 0; // 15
-const NUM_SHARKS = 0; // 5
+const NUM_SEAWEEDS = 15; // 15
+const NUM_SHARKS = 5; // 5
 const NUM_PLASTICBAGS = 25; // 25
 const TOTAL_NUM_ITEMS =
   NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
+const FONT_SIZE = 22;
 
 var GameScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
   initialize: function GameScene() {
-    Phaser.Scene.call(this, { key: "gameScene" });
+    Phaser.Scene.call(this, { key: "gameScene", active: true });
   },
 
   preload: function () {
@@ -23,6 +24,7 @@ var GameScene = new Phaser.Class({
     numBubblesCollected = 0;
     gameOver = false;
     inDialogue = false;
+    inBubble = false;
 
     this.load.image("background", "assets/background.png");
     this.load.image("rock", "assets/rock.png");
@@ -77,7 +79,7 @@ var GameScene = new Phaser.Class({
 
     for (var i = 0; i < TOTAL_NUM_ITEMS; i++) {
       // parameters
-      var x = Phaser.Math.RND.between(0, BG_WIDTH);
+      var x = Phaser.Math.RND.between(200, BG_WIDTH);
       var y = Phaser.Math.RND.between(0, BG_HEIGHT);
       var object;
       if (i < NUM_BUBBLES) {
@@ -105,24 +107,23 @@ var GameScene = new Phaser.Class({
       object.setCollideWorldBounds(true);
     }
 
-    //  The score at beginning
-    scoreText = this.add.text(16, 16, "0", {
-      fontFamily: "Arial",
-      fontSize: "32px",
-      fill: "#000",
-    });
-    // scoreText.anchor.setTo(0,0);
-
-    //  Collide the player and other objects with the rocks
+    // Collide the player and other objects with the rocks
     this.physics.add.collider(player, rocks);
     this.physics.add.collider(plasticBags, rocks);
     this.physics.add.collider(seaweeds, rocks);
     this.physics.add.collider(bubbles, rocks);
     this.physics.add.collider(sharks, rocks);
 
-    //  Checks to see if the player overlaps with any of the collectibles
-    var collectibles = [bubbles, plasticBags];
-    this.physics.add.overlap(player, collectibles, collectItem, null, this);
+    // Checks to see if the player overlaps with any of the collectibles
+    // var collectibles = [bubbles, plasticBags];
+    this.physics.add.overlap(
+      player,
+      plasticBags,
+      collectPlasticBag,
+      null,
+      this
+    );
+    this.physics.add.overlap(player, bubbles, collectBubble, null, this);
 
     // Check for collisions with obstacles
     var obstacles = [seaweeds, sharks];
@@ -131,14 +132,27 @@ var GameScene = new Phaser.Class({
     // Check if collided with diver
     this.physics.add.collider(player, diver, talkToDiver, null, this);
   },
+
   update: function () {
     if (gameOver) {
-      return;
+      if (cursors.space.isDown) {
+        this.scene.restart();
+      } else {
+        return;
+      }
     }
 
     if (inDialogue) {
       if (cursors.space.isDown) {
         this.scene.restart();
+      } else {
+        return;
+      }
+    }
+
+    if (inBubble) {
+      if (cursors.space.isDown) {
+        this.physics.resume();
       } else {
         return;
       }
@@ -162,6 +176,76 @@ var GameScene = new Phaser.Class({
   },
 });
 
+var ModalScene = new Phaser.Class({
+  Extends: Phaser.Scene,
+
+  initialize: function ModalScene() {
+    Phaser.Scene.call(this, { key: "modalScene" });
+  },
+
+  preload: function () {
+    this.load.json("jsonData", "data/facts.json");
+  },
+
+  create: function () {
+    // Choose random fact
+    console.log(this.cache.json.get("jsonData"));
+    facts = this.cache.json.get("jsonData").facts;
+    var randomIndex = Phaser.Math.RND.between(0, 16);
+    var content = [
+        facts[randomIndex], 
+        "\n",
+        "Press SPACE to continue."
+    ];
+
+    // Make text box
+    graphics = this.add.graphics({
+      fillStyle: {
+        color: 0xC3E6EE,
+        alpha: 0.75,
+      },
+    });
+    graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
+    var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
+    var text = this.add
+      .text(CANVAS_WIDTH / 8 + 40, CANVAS_HEIGHT / 4 + 40, content, {
+        fontSize: FONT_SIZE,
+        fontFamily: "Arial",
+        color: "#005C7A",
+        wordWrap: { width: 600 - 80 },
+      })
+      .setOrigin(0);
+    text.setMask(mask);
+  },
+
+  update: function () {
+    if (cursors.space.isDown) {
+      graphics.destroy();
+      inBubble = false;
+    }
+  },
+});
+
+var ScoreScene = new Phaser.Class({
+  Extends: Phaser.Scene,
+
+  initialize: function ScoreScene() {
+    Phaser.Scene.call(this, { key: "scoreScene", active: true });
+  },
+
+  preload: function () {},
+
+  create: function () {
+    scoreText = this.add.text(16, 16, "0", {
+      fontFamily: "Arial",
+      fontSize: 40,
+      color: "#fff",
+    });
+  },
+
+  update: function () {},
+});
+
 var config = {
   type: Phaser.AUTO,
   width: CANVAS_WIDTH,
@@ -173,7 +257,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [GameScene],
+  scene: [GameScene, ModalScene, ScoreScene],
 };
 
 var player;
@@ -192,20 +276,26 @@ var numBagsCollected;
 var numBubblesCollected;
 var gameOver;
 var inDialogue;
+var inBubble;
+var textBoxContent;
 
 var game = new Phaser.Game(config);
 
-function collectItem(player, item) {
-  item.disableBody(true, true);
-  if (item.texture.key === "bubble") {
-    score += 100;
-    numBubblesCollected += 1;
-    inDialogue = true;
-  } else {
-    score += 10;
-    numBagsCollected += 1;
-  }
+function collectPlasticBag(player, plasticBag) {
+  plasticBag.disableBody(true, true);
+  score += 10;
+  numBagsCollected += 1;
   scoreText.setText(score);
+}
+
+function collectBubble(player, bubble) {
+  bubble.disableBody(true, true);
+  score += 100;
+  numBubblesCollected += 1;
+  scoreText.setText(score);
+  inBubble = true;
+  this.physics.pause();
+  this.scene.launch("modalScene");
 }
 
 function hitObstacle(player, obstacle) {
@@ -213,21 +303,6 @@ function hitObstacle(player, obstacle) {
   player.setTint(0xff0000);
   gameOver = true;
   console.log("game over!");
-}
-
-function makeTextBox(content) {
-  graphics = this.add.graphics({ fillStyle: { color: 0xf6e5ac, alpha: 0.7 } });
-  graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
-  var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
-  var text = this.add
-    .text(CANVAS_WIDTH / 8 + 20, CANVAS_HEIGHT / 4 + 20, content, {
-      fontSize: 22,
-      fontFamily: "Arial",
-      color: "#005C7A",
-      wordWrap: { width: 600 - 40 },
-    })
-    .setOrigin(0);
-  text.setMask(mask);
 }
 
 function talkToDiver(player, diver) {
@@ -274,7 +349,7 @@ function talkToDiver(player, diver) {
   var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
   var text = this.add
     .text(CANVAS_WIDTH / 8 + 20, CANVAS_HEIGHT / 4 + 20, content, {
-      fontSize: 22,
+      fontSize: FONT_SIZE,
       fontFamily: "Arial",
       color: "#005C7A",
       wordWrap: { width: 600 - 40 },
