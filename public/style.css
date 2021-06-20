@@ -78,6 +78,7 @@
   margin: auto;
   padding: 7.5%;
 }
+
 .text1 {
   text-align: center;
   color: white;
@@ -86,6 +87,7 @@
   border: 15px double #006882;
   margin-left: 10%;
   margin-right: 10%;
+  font-family: "Balsamiq Sans"
 }
 
 .text1 h1 {
@@ -128,6 +130,5 @@
 
 .text2 p {
   color: black;
-  font-size: 22px;
-  font-family: "Balsamiq Sans";
+  font-size: 21px;
 }
