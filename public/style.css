@@ -129,3 +129,8 @@ body {
   font-size: 21px;
   font-family: "Balsamiq Sans";
 }
+
+.QR{
+  width: 10%;
+  padding: 10px;
+}
