@@ -9,7 +9,7 @@ const NUM_SHARKS = 5; // 5
 const NUM_PLASTICBAGS = 25; // 25
 const TOTAL_NUM_ITEMS =
   NUM_BUBBLES + NUM_SEAWEEDS + NUM_SHARKS + NUM_PLASTICBAGS;
-const FONT_SIZE = 22;
+const FONT_SIZE = 20;
 
 var GameScene = new Phaser.Class({
   Extends: Phaser.Scene,
@@ -23,7 +23,7 @@ var GameScene = new Phaser.Class({
     numBagsCollected = 0;
     numBubblesCollected = 0;
     gameOver = false;
-    inDialogue = false;
+    withDiver = false;
     inBubble = false;
 
     this.load.image("background", "assets/background.png");
@@ -46,6 +46,8 @@ var GameScene = new Phaser.Class({
     // Set world bounds
     this.physics.world.setBounds(0, 0, BG_WIDTH, BG_HEIGHT);
 
+    scoreText.setText(score);
+
     // Make rocks
     rocks = this.physics.add.staticGroup();
     for (var i = 0; i < NUM_ROCKS; i++) {
@@ -66,7 +68,7 @@ var GameScene = new Phaser.Class({
     player.setCollideWorldBounds(true);
 
     // Add diver at end of map at 2200, 200
-    diver = this.physics.add.image(200, 200, "diver");
+    diver = this.physics.add.image(2200, 200, "diver");
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
@@ -142,7 +144,7 @@ var GameScene = new Phaser.Class({
       }
     }
 
-    if (inDialogue) {
+    if (withDiver) {
       if (cursors.space.isDown) {
         this.scene.restart();
       } else {
@@ -176,11 +178,31 @@ var GameScene = new Phaser.Class({
   },
 });
 
-var ModalScene = new Phaser.Class({
+var ScoreScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
-  initialize: function ModalScene() {
-    Phaser.Scene.call(this, { key: "modalScene" });
+  initialize: function ScoreScene() {
+    Phaser.Scene.call(this, { key: "scoreScene", active: true });
+  },
+
+  preload: function () {},
+
+  create: function () {
+    scoreText = this.add.text(16, 16, "0", {
+      fontFamily: "Arial",
+      fontSize: 40,
+      color: "#fff",
+    });
+  },
+
+  update: function () {},
+});
+
+var BubbleScene = new Phaser.Class({
+  Extends: Phaser.Scene,
+
+  initialize: function BubbleScene() {
+    Phaser.Scene.call(this, { key: "bubbleScene" });
   },
 
   preload: function () {
@@ -193,15 +215,17 @@ var ModalScene = new Phaser.Class({
     facts = this.cache.json.get("jsonData").facts;
     var randomIndex = Phaser.Math.RND.between(0, 16);
     var content = [
-        facts[randomIndex], 
-        "\n",
-        "Press SPACE to continue."
+      "You popped a fact bubble! Did you know:",
+      "\n",
+      facts[randomIndex],
+      "\n",
+      "Press SPACE to continue.",
     ];
 
     // Make text box
     graphics = this.add.graphics({
       fillStyle: {
-        color: 0xC3E6EE,
+        color: 0xc3e6ee, // light blue
         alpha: 0.75,
       },
     });
@@ -226,24 +250,136 @@ var ModalScene = new Phaser.Class({
   },
 });
 
-var ScoreScene = new Phaser.Class({
+var WinScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
-  initialize: function ScoreScene() {
-    Phaser.Scene.call(this, { key: "scoreScene", active: true });
+  initialize: function WinScene() {
+    Phaser.Scene.call(this, { key: "winScene" });
   },
 
   preload: function () {},
 
   create: function () {
-    scoreText = this.add.text(16, 16, "0", {
-      fontFamily: "Arial",
-      fontSize: 40,
-      color: "#fff",
+    // Cover singular or plural bags/bubbles
+    var bags = "plastic bags";
+    var bubbles = "bubbles";
+    if (numBagsCollected == 1) {
+      bags = "plastic bag";
+    }
+    if (numBubblesCollected == 1) {
+      bubbles = "bubble";
+    }
+
+    // Set up text box content
+    var content = [
+      "Thank you for your help, Mr. Turtle! I couldn't have done it without you.",
+      "\n",
+      "You collected " +
+        numBagsCollected +
+        " " +
+        bags +
+        " and popped " +
+        numBubblesCollected +
+        " " +
+        bubbles +
+        ".",
+      "Your final score is " + score + "!",
+      "\n",
+      "Press SPACE to play again.",
+    ];
+
+    // Make text box
+    graphics = this.add.graphics({
+      fillStyle: {
+        color: 0xf6e5ac, // yellow
+        alpha: 0.75,
+      },
     });
+    graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
+    var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
+    var text = this.add
+      .text(CANVAS_WIDTH / 8 + 40, CANVAS_HEIGHT / 4 + 40, content, {
+        fontSize: FONT_SIZE,
+        fontFamily: "Arial",
+        color: "#005C7A",
+        wordWrap: { width: 600 - 80 },
+      })
+      .setOrigin(0);
+    text.setMask(mask);
   },
 
-  update: function () {},
+  update: function () {
+    if (cursors.space.isDown) {
+      graphics.destroy();
+      withDiver = false;
+    }
+  },
+});
+
+var LossScene = new Phaser.Class({
+  Extends: Phaser.Scene,
+
+  initialize: function LossScene() {
+    Phaser.Scene.call(this, { key: "lossScene" });
+  },
+
+  preload: function () {},
+
+  create: function () {
+    // Cover singular or plural bags/bubbles
+    var bags = "plastic bags";
+    var bubbles = "bubbles";
+    if (numBagsCollected == 1) {
+      bags = "plastic bag";
+    }
+    if (numBubblesCollected == 1) {
+      bubbles = "bubble";
+    }
+
+    // Set up text box content
+    var content = [
+      "Oh no, watch out!",
+      "\n",
+      "You collected " +
+        numBagsCollected +
+        " " +
+        bags +
+        " and popped " +
+        numBubblesCollected +
+        " " +
+        bubbles +
+        ".",
+      "Your final score is " + score + ".",
+      "\n",
+      "Press SPACE to try again.",
+    ];
+
+    // Make text box
+    graphics = this.add.graphics({
+      fillStyle: {
+        color: 0xB67975, // pink
+        alpha: 0.75,
+      },
+    });
+    graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
+    var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
+    var text = this.add
+      .text(CANVAS_WIDTH / 8 + 40, CANVAS_HEIGHT / 4 + 40, content, {
+        fontSize: FONT_SIZE,
+        fontFamily: "Arial",
+        color: "#fff",
+        wordWrap: { width: 600 - 80 },
+      })
+      .setOrigin(0);
+    text.setMask(mask);
+  },
+
+  update: function () {
+    if (cursors.space.isDown) {
+      graphics.destroy();
+      gameOver = false;
+    }
+  },
 });
 
 var config = {
@@ -257,7 +393,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [GameScene, ModalScene, ScoreScene],
+  scene: [GameScene, ScoreScene, BubbleScene, WinScene, LossScene],
 };
 
 var player;
@@ -275,9 +411,8 @@ var score;
 var numBagsCollected;
 var numBubblesCollected;
 var gameOver;
-var inDialogue;
+var withDiver;
 var inBubble;
-var textBoxContent;
 
 var game = new Phaser.Game(config);
 
@@ -295,65 +430,20 @@ function collectBubble(player, bubble) {
   scoreText.setText(score);
   inBubble = true;
   this.physics.pause();
-  this.scene.launch("modalScene");
+  this.scene.launch("bubbleScene");
 }
 
 function hitObstacle(player, obstacle) {
+  console.log("GAME OVER");
+  gameOver = true;
   this.physics.pause();
   player.setTint(0xff0000);
-  gameOver = true;
-  console.log("game over!");
+  this.scene.launch("lossScene");
 }
 
 function talkToDiver(player, diver) {
-  console.log("talking to diver!");
-  this.physics.pause(); // pause game
-  inDialogue = true;
-
-  // Cover singular or plural bags/bubbles
-  var BAGS = "plastic bags";
-  var BUBBLES = "bubbles";
-  if (numBagsCollected == 1) {
-    BAGS = "plastic bag";
-  }
-  if (numBubblesCollected == 1) {
-    BUBBLES = "bubble";
-  }
-
-  // Set up text box content
-  var content = [
-    "Thank you for your help, Mr. Turtle! I couldn't have done it without you.",
-    "\n",
-    "You collected " +
-      numBagsCollected +
-      " " +
-      BAGS +
-      " and popped " +
-      numBubblesCollected +
-      " " +
-      BUBBLES +
-      ".",
-    "Your final score is " + score + "!",
-    "\n",
-    "Press SPACE to play again.",
-  ];
-
-  // Make text box
-  graphics = this.add.graphics({
-    fillStyle: {
-      color: 0xf6e5ac,
-      alpha: 0.75,
-    },
-  });
-  graphics.fillRoundedRect(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 4, 600, 300, 20);
-  var mask = new Phaser.Display.Masks.GeometryMask(this, graphics);
-  var text = this.add
-    .text(CANVAS_WIDTH / 8 + 20, CANVAS_HEIGHT / 4 + 20, content, {
-      fontSize: FONT_SIZE,
-      fontFamily: "Arial",
-      color: "#005C7A",
-      wordWrap: { width: 600 - 40 },
-    })
-    .setOrigin(0);
-  text.setMask(mask);
+  console.log("Talking to diver");
+  withDiver = true;
+  this.physics.pause();
+  this.scene.launch("winScene");
 }
