@@ -43,6 +43,10 @@ Education and entertainment is the best way for people to learn something so we 
 * [Phaser 3](https://www.phaser.io/)
 * HTML
 * CSS
-* Firebase Hosting
+* [Figma](https://www.figma.com/)
+* [Procreate](https://procreate.art/)
+* [EchoAR](https://www.echoar.xyz/)
+* [Animaker](https://www.animaker.com/)
+* [Firebase Hosting](https://firebase.google.com/docs/hosting/)
 
 ![Game](./public/assets/screenshots/game.png)
