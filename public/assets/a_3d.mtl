@@ -1,0 +1,28 @@
+# Exported from 3D Builder
+
+newmtl Mat_0
+Kd 1.000000 1.000000 1.000000
+map_Kd background.png
+
+newmtl FFFFFFFF_0
+Kd 1.000000 1.000000 1.000000
+
+newmtl Mat_1
+Kd 1.000000 1.000000 1.000000
+map_Kd turtle.png
+
+newmtl Mat_2
+Kd 1.000000 1.000000 1.000000
+map_Kd seaweed.png
+
+newmtl Mat_3
+Kd 1.000000 1.000000 1.000000
+map_Kd plasticbag.png
+
+newmtl Mat_4
+Kd 1.000000 1.000000 1.000000
+map_Kd diver.png
+
+newmtl Mat_5
+Kd 1.000000 1.000000 1.000000
+map_Kd bubble.png
